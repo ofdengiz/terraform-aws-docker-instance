@@ -1,29 +1,25 @@
-> ### 📌 Archived reference
->
-> Built **2023** during the Clarusway AWS DevOps curriculum. Kept public as a reference for the patterns I use day-to-day.
->
-> Terraform pattern for bootstrapping a Dockerized EC2 workload on AWS, including VPC networking and security group configuration.
->
-> **Stack:** Terraform · AWS EC2 · Docker · HCL
->
-> ➡️ **Current work:** my portfolio at **[https://omerdengiz.com](https://omerdengiz.com)** — a static site on AWS S3 + CloudFront + Lambda@Edge, provisioned with Terraform across two AWS accounts.
+# terraform-aws-docker-instance
 
----Terraform Module to provision an AWS EC2 instance with the latest amazon linux 2 ami and installed docker in it.
+Terraform pattern for bootstrapping a Dockerized EC2 workload on AWS. Provisions an EC2 instance, security group with configurable inbound ports, and a `user_data` script that installs Docker and Docker Compose.
 
-Not intended for production use. It is an example module.
+**Stack:** Terraform · AWS (EC2, VPC security groups) · HCL · Bash (user_data)
 
-It is just for showing how to create a publish module in Terraform Registry.
+## What this demonstrates
 
-Usage:
+- Parameterised security group with a `dynamic "ingress"` block driven by a `list(number)` of ports
+- AMI lookup via `data "aws_ami"` with owner + filter pattern (Amazon Linux family)
+- `user_data` templating so the same module can bootstrap differently-named hosts
+- Clean `variables.tf` / `outputs.tf` split
+
+## Usage
 
 ```hcl
-
-provider "aws" {
-  region = "us-east-1"
-}
-
-module "docker_instance" {
-    source = "<github-username>/docker-instance/aws"
-    key_name = "clarusway"
+module "docker_ec2" {
+  source   = "ofdengiz/docker-instance/aws"
+  key_name = "ofdengiz"
 }
 ```
+
+## Notes
+
+Small reference module — intentionally minimal. For my current AWS-on-Terraform work (cross-account S3 + CloudFront + Lambda@Edge) see **[omerdengiz.com](https://omerdengiz.com)**.
